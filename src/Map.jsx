@@ -5,7 +5,7 @@ import geoJson from "./assets/chicago-parks.json";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 
 mapboxgl.accessToken =
-  "pk.eyJ1IjoibmF0aGFuc2NobWlkdDMiLCJhIjoiY2xqZnd0dGFtMDRndzNxbXF6ZHMxY3BmdCJ9.rYBdQrH_WubZcEEMda1JSA";
+  "pk.eyJ1IjoibmF0aGFuc2NobWlkdDMiLCJhIjoiY2xqaG1kYWphMDA4MTNscWtzdGdubmUxcSJ9.oe5M6E9qr8kpaAFFq9Mtrw";
 
 const Map = () => {
   const mapContainer = useRef(null);
