@@ -3,6 +3,7 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "1",
         "title": "Lincoln Park",
         "description": "A northside park that is home to the Lincoln Park Zoo"
       },
@@ -14,6 +15,7 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "2",
         "title": "Burnham Park",
         "description": "A lakefront park on Chicago's south side"
       },
@@ -25,6 +27,7 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "3",
         "title": "Millennium Park",
         "description": "A downtown park known for its art installations and unique architecture"
       },
@@ -36,6 +39,7 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "4",
         "title": "Grant Park",
         "description": "A downtown park that is the site of many of Chicago's favorite festivals and events"
       },
@@ -47,6 +51,7 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "5",
         "title": "Humboldt Park",
         "description": "A large park on Chicago's northwest side"
       },
@@ -58,6 +63,7 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "6",
         "title": "Douglas Park",
         "description": "A large park near in Chicago's North Lawndale neighborhood"
       },
@@ -69,6 +75,7 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "7",
         "title": "Calumet Park",
         "description": "A park on the Illinois-Indiana border featuring a historic fieldhouse"
       },
@@ -80,6 +87,7 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "8",
         "title": "Jackson Park",
         "description": "A lakeside park that was the site of the 1893 World's Fair"
       },
@@ -91,6 +99,7 @@
     {
       "type": "Feature",
       "properties": {
+        "id": "9",
         "title": "Columbus Park",
         "description": "A large park in Chicago's Austin neighborhood"
       },

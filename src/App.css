@@ -20,7 +20,7 @@
   left: 0;
   margin: 12px;
   border-radius: 4px;
-  }
+}
 
 .logo {
   height: 4em;
@@ -28,24 +28,51 @@
   will-change: filter;
   transition: filter 300ms;
 }
-.pop-up .mapboxgl-popup-content {
-  color: #000000; 
-}
-.pop-up .pop-content {
-  text-align: left;
-  padding-right: 14px;
-}
-
-.pop-up .mapboxgl-popup-close-button {
-  color: #000000; 
-}
-
-
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+.mapboxgl-popup > .mapboxgl-popup-content {
+  color: #000000; 
+}
+.mapboxgl-popup-content div {
+  padding: 10px;
+}
+.mapboxgl-popup{
+  text-align: left;
+  padding-right: 14px;
+}
+
+.mapboxgl-popup .mapboxgl-popup-close-button{
+  color: #000000; 
+}
+
+.map-wrapper {
+  display: flex;
+}
+.map-wrapper .list{
+  overflow: auto;
+  height: 600px;
+  color: #000000;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  flex-basis: 33.33%;
+}
+.map-wrapper .list .item{
+  margin: 5px 0;
+  background-color: rgba(35, 55, 75, 0.9);
+}
+.map-wrapper .list .item:hover{
+  background-color: rgba(35, 55, 75, 1);
+}
+.map-wrapper .list .item h2{
+  margin: 10px 5px;
+  font-size: 1em;
 }
 
 @keyframes logo-spin {

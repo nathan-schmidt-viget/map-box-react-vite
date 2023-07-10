@@ -15,6 +15,28 @@ const Map = () => {
   const [zoom, setZoom] = useState(11);
   const [pitch, setPitch] = useState(15);
 
+  function flyToStore(currentFeature) {
+    map.current.flyTo({
+      center: currentFeature.geometry.coordinates,
+      zoom: 11.5,
+      duration: 1000,
+      essential: true // This animation is considered essential with
+      //respect to prefers-reduced-motion
+    });
+  }
+
+  function createPopUp(currentFeature) {
+    const popUps = document.getElementsByClassName('mapboxgl-popup');
+    const coordinates = currentFeature.geometry.coordinates.slice();
+    /** Check if there is already a popup on the map and if so, remove it */
+    if (popUps[0]) popUps[0].remove();
+
+    const popup = new mapboxgl.Popup({ closeOnClick: false })
+      .setLngLat(coordinates)
+      .setHTML(`<div class="pop-content"><p>${currentFeature.properties.description}</p></div>`)
+      .addTo(map.current);
+  }
+
   useEffect(() => {
     if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
@@ -60,25 +82,21 @@ const Map = () => {
       });
 
       map.current.on("click", "points", (e) => {
+        /* Determine if a feature in the "locations" layer exists at that point. */
+        const features = map.current.queryRenderedFeatures(e.point, {
+          layers: ['points']
+        });
 
-        // Copy coordinates array.
-        const coordinates = e.features[0].geometry.coordinates.slice();
-        const description = e.features[0].properties.description;
-        const popContent = `<div class="pop-content"><p>${description}</p></div>`;
+        /* If it does not exist, return */
+        if (!features.length) return;
 
+        const clickedPoint = features[0];
+        
+        /* Fly to the point */
+        flyToStore(clickedPoint);
 
-        // Ensure that if the map is zoomed out such that multiple
-        // copies of the feature are visible, the popup appears
-        // over the copy being pointed to.
-        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-        }
-
-        new mapboxgl.Popup()
-          .setLngLat(coordinates)
-          .setHTML(popContent)
-          .addClassName('pop-up')
-          .addTo(map.current);
+        /* Close all other popups and display popup for clicked store */
+        createPopUp(clickedPoint);
       });
 
       // Change the cursor to a pointer when the mouse is over the places layer.
@@ -122,10 +140,19 @@ const Map = () => {
 
   return (
     <>
+      <div className="map-wrapper">
+        <div className="list">
+          {geoJson.features.map((park, i) => (  
+            <button className="item" key={i} onClick={() => (createPopUp(park), flyToStore(park)) }>
+              <h2>{park.properties.title}</h2>
+            </button>
+          ))}
+        </div>
+        <div ref={mapContainer} className="map-container" />
+      </div>
       <div className="map-info">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom} | Pitch: {pitch}
       </div>
-      <div ref={mapContainer} className="map-container" />
     </>
   );
 };
