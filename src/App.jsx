@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import Map from "./Map"
+import React from "react";
+import Map from "./components/Map"
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./App.css";
 
@@ -7,11 +7,17 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 
 function App() {
-  const [count, setCount] = useState(0);
   return (
     <>
-      <h1>MapBox Demo</h1>
-      <Map/>
+      <h1>National Park Service Locations</h1>
+      <Map />
+      <footer className="footer">
+        <p>Built on Vite and React</p>
+        <div className="logos"> 
+          <img src={viteLogo} className="logo" alt="Vite logo" />
+          <img src={reactLogo} className="logo react" alt="React logo" />
+        </div>
+      </footer>
     </>
   );
 }
