@@ -65,14 +65,14 @@
 }
 .map-wrapper .list .item{
   margin: 5px 0;
+  padding: 15px 15px;
   background-color: rgba(35, 55, 75, 0.9);
 }
 .map-wrapper .list .item:hover{
-  background-color: rgba(35, 55, 75, 1);
+  background-color: rgb(1, 151, 101);
 }
-.map-wrapper .list .item h2{
-  margin: 10px 5px;
-  font-size: 1em;
+.map-wrapper .list .item.active{
+  background-color: rgb(1, 151, 101);
 }
 
 @keyframes logo-spin {

@@ -1,7 +1,8 @@
 import React, { useRef, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
-import geoJson from "./assets/chicago-parks.json";
+import geoJson from "./assets/nps.json";
+import * as turf from "@turf/turf";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 
 mapboxgl.accessToken =
@@ -10,32 +11,78 @@ mapboxgl.accessToken =
 const Map = () => {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [lng, setLng] = useState(-87.65);
-  const [lat, setLat] = useState(41.84);
-  const [zoom, setZoom] = useState(11);
-  const [pitch, setPitch] = useState(15);
+  const [lng, setLng] = useState(-101.56);
+  const [lat, setLat] = useState(38.83);
+  const [zoom, setZoom] = useState(3.5);
+  const [pitch, setPitch] = useState(0);
 
-  function flyToStore(currentFeature) {
+  const flyToStore = (currentFeature) => {
     map.current.flyTo({
       center: currentFeature.geometry.coordinates,
-      zoom: 11.5,
+      zoom: 8.5,
       duration: 1000,
-      essential: true // This animation is considered essential with
+      pitch: 55,
+      essential: true, // This animation is considered essential with
       //respect to prefers-reduced-motion
     });
-  }
+  };
 
-  function createPopUp(currentFeature) {
-    const popUps = document.getElementsByClassName('mapboxgl-popup');
+  const createPopUp = (currentFeature, e) => {
+    const popUps = document.getElementsByClassName("mapboxgl-popup");
     const coordinates = currentFeature.geometry.coordinates.slice();
     /** Check if there is already a popup on the map and if so, remove it */
-    if (popUps[0]) popUps[0].remove();
+    if (popUps[0]) popUps[0].remove()
+    
+    toggleClass(currentFeature.id)
 
     const popup = new mapboxgl.Popup({ closeOnClick: false })
       .setLngLat(coordinates)
-      .setHTML(`<div class="pop-content"><p>${currentFeature.properties.description}</p></div>`)
+      .setHTML(
+        `<div class="pop-content"><p>${currentFeature.properties.Name}</p><p>Code:${currentFeature.properties.Code}</p></div>`
+      )
       .addTo(map.current);
-  }
+  };
+
+  const toggleClass = (e) => {
+    const activeItem = document.getElementsByClassName("active");
+    if (activeItem[0]) {
+      activeItem[0].classList.remove("active");
+    }
+    document.getElementById(`listing-${e}`).classList.add("active");
+  };
+
+  const getBbox = (sortedStores, storeIdentifier, searchResult) => {
+    const lats = [
+      sortedStores.features[storeIdentifier].geometry.coordinates[1],
+      searchResult.coordinates[1],
+    ];
+    const lons = [
+      sortedStores.features[storeIdentifier].geometry.coordinates[0],
+      searchResult.coordinates[0],
+    ];
+    const sortedLons = lons.sort((a, b) => {
+      if (a > b) {
+        return 1;
+      }
+      if (a.distance < b.distance) {
+        return -1;
+      }
+      return 0;
+    });
+    const sortedLats = lats.sort((a, b) => {
+      if (a > b) {
+        return 1;
+      }
+      if (a.distance < b.distance) {
+        return -1;
+      }
+      return 0;
+    });
+    return [
+      [sortedLons[0], sortedLats[0]],
+      [sortedLons[1], sortedLats[1]],
+    ];
+  };
 
   useEffect(() => {
     if (map.current) return; // initialize map only once
@@ -61,6 +108,7 @@ const Map = () => {
             features: geoJson.features,
           },
         });
+
         // Add a symbol layer
         map.current.addLayer({
           id: "points",
@@ -84,14 +132,14 @@ const Map = () => {
       map.current.on("click", "points", (e) => {
         /* Determine if a feature in the "locations" layer exists at that point. */
         const features = map.current.queryRenderedFeatures(e.point, {
-          layers: ['points']
+          layers: ["points"],
         });
 
         /* If it does not exist, return */
         if (!features.length) return;
 
         const clickedPoint = features[0];
-        
+
         /* Fly to the point */
         flyToStore(clickedPoint);
 
@@ -108,18 +156,53 @@ const Map = () => {
       map.current.on("mouseleave", "points", () => {
         map.current.getCanvas().style.cursor = "";
       });
+
+      // geoJson.features.forEach(element => {
+      //   setPinBox(pinBox => [...pinBox, element.geometry.coordinates])
+      // });
+      // var tin = turf.tin(pinBox);
     });
 
     //rotate the map on load
     //map.current.rotateTo(180, { duration: 20000 });
 
     //Geo search input
-    map.current.addControl(
-      new MapboxGeocoder({
-        accessToken: mapboxgl.accessToken,
-        mapboxgl: mapboxgl,
-      })
-    );
+    const geocoder = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      mapboxgl: mapboxgl,
+    });
+
+    map.current.addControl(geocoder, "top-left");
+
+    //after search results
+    geocoder.on("result", (event) => {
+      const searchResult = event.result.geometry;
+      const options = { units: "miles" };
+      geoJson.features.forEach((item) => {
+        item.properties.distance = turf.distance(
+          searchResult,
+          item.geometry,
+          options
+        );
+      });
+
+      geoJson.features.sort((a, b) => {
+        if (a.properties.distance > b.properties.distance) {
+          return 1;
+        }
+        if (a.properties.distance < b.properties.distance) {
+          return -1;
+        }
+        return 0; // a must be equal to b
+      });
+
+      const bbox = getBbox(geoJson, 0, searchResult);
+      map.current.fitBounds(bbox, {
+        padding: 50,
+      });
+      
+      createPopUp(geoJson.features[0]);
+    });
 
     // Add navigation control (the +/- zoom buttons)
     map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
@@ -142,9 +225,19 @@ const Map = () => {
     <>
       <div className="map-wrapper">
         <div className="list">
-          {geoJson.features.map((park, i) => (  
-            <button className="item" key={i} onClick={() => (createPopUp(park), flyToStore(park)) }>
-              <h2>{park.properties.title}</h2>
+          {geoJson.features.map((item) => (
+            <button
+              className="item"
+              id={`listing-${item.id}`}
+              key={item.id}
+              onClick={(e) => (
+                createPopUp(item, e), flyToStore(item), toggleClass(item.id)
+              )}
+            >
+              {item.properties.Name}<br/>
+              {item.properties.distance
+                ? `${Math.round(item.properties.distance * 100) / 100} miles away`
+                : ""}
             </button>
           ))}
         </div>
