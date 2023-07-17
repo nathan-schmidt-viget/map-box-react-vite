@@ -14,7 +14,6 @@ mapboxgl.accessToken = import.meta.env.VITE_MAP_BOX_KEY;
 const Map = () => {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const locationAPI = useRef(import.meta.env.VITE_NPS_KEY);
   const [lng, setLng] = useState(-101.56);
   const [lat, setLat] = useState(38.83);
   const [zoom, setZoom] = useState(3.5);
