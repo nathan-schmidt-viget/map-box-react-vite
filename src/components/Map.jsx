@@ -9,11 +9,12 @@ import geoJson from "../assets/nps.json";
 import LocationButton from "./LocationButton";
 import LocationPopup from "./LocationPopup";
 import LocationDetails from "./LocationDetails";
-mapboxgl.accessToken = import.meta.env.VITE_MAP_BOX_KEY
+mapboxgl.accessToken = import.meta.env.VITE_MAP_BOX_KEY;
 
 const Map = () => {
   const mapContainer = useRef(null);
   const map = useRef(null);
+  const locationAPI = useRef(import.meta.env.VITE_NPS_KEY);
   const [lng, setLng] = useState(-101.56);
   const [lat, setLat] = useState(38.83);
   const [zoom, setZoom] = useState(3.5);
@@ -141,7 +142,9 @@ const Map = () => {
       setIsLoading(true);
       try {
         const { data } = await axios.get(
-          `https://developer.nps.gov/api/v1/parks?parkCode=${selectedItem}&limit=1&api_key=${import.meta.env.VITE_NPS_KEY}`,
+          `https://developer.nps.gov/api/v1/parks?parkCode=${selectedItem}&limit=1&api_key=${
+            import.meta.env.VITE_NPS_KEY
+          }`,
           {
             headers: {
               Accept: "application/json",
@@ -156,7 +159,7 @@ const Map = () => {
       }
     };
 
-    fetchMapItemData()
+    fetchMapItemData();
   }, [selectedItem]);
 
   const flyToLocation = (currentItem) => {
@@ -177,7 +180,7 @@ const Map = () => {
     const coordinates = currentItem.geometry.coordinates.slice();
     // Check if there is already a popup on the map and if so, remove it
     if (popUps[0]) popUps[0].remove();
-    
+
     //mapbox popup offset to center on custom marker - https://docs.mapbox.com/mapbox-gl-js/api/markers/#popup
     const popup = new mapboxgl.Popup({ offset: [8, -10] })
       .setLngLat(coordinates)
@@ -230,23 +233,17 @@ const Map = () => {
     <>
       <div className="map-wrapper">
         <section ref={mapContainer} className="map-container" />
-          <LocationButton
-            geoMap={geoMap}
-            selectedItem={selectedItem}
-            createPopUp={createPopUp}
-            flyToLocation={flyToLocation}
-          />
-      </div>
-      <div ref={popUpElement}>
-        <LocationPopup
-          geoMapItem={geoMapItem}
-          isLoading={isLoading}
+        <LocationButton
+          geoMap={geoMap}
+          selectedItem={selectedItem}
+          createPopUp={createPopUp}
+          flyToLocation={flyToLocation}
         />
       </div>
-      <LocationDetails
-        geoMapItem={geoMapItem}
-        isLoading={isLoading}
-      />
+      <div ref={popUpElement}>
+        <LocationPopup geoMapItem={geoMapItem} isLoading={isLoading} />
+      </div>
+      <LocationDetails geoMapItem={geoMapItem} isLoading={isLoading} />
     </>
   );
 };
