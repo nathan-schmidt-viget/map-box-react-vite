@@ -17,6 +17,7 @@ function App() {
           <img src={viteLogo} className="logo" alt="Vite logo" />
           <img src={reactLogo} className="logo react" alt="React logo" />
         </div>
+        <p>View on <a href="https://github.com/nathan-schmidt-viget/map-box-react-vite">GitHub</a></p>
       </footer>
     </>
   );
