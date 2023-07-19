@@ -232,12 +232,6 @@ const Map = () => {
     <>
       <div className="map-wrapper">
         <section ref={mapContainer} className="map-container" />
-        <LocationButton
-          geoMap={geoMap}
-          selectedItem={selectedItem}
-          createPopUp={createPopUp}
-          flyToLocation={flyToLocation}
-        />
       </div>
       <div ref={popUpElement}>
         <LocationPopup geoMapItem={geoMapItem} isLoading={isLoading} />
