@@ -6,7 +6,7 @@ import axios from "axios";
 import * as turf from "@turf/turf";
 
 import geoJson from "../assets/nps.json";
-import LocationButton from "./LocationButton";
+//import LocationButton from "./LocationButton";
 import LocationPopup from "./LocationPopup";
 import LocationDetails from "./LocationDetails";
 mapboxgl.accessToken = import.meta.env.VITE_MAP_BOX_KEY;
@@ -14,9 +14,9 @@ mapboxgl.accessToken = import.meta.env.VITE_MAP_BOX_KEY;
 const Map = () => {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [lng, setLng] = useState(-101.56);
-  const [lat, setLat] = useState(38.83);
-  const [zoom, setZoom] = useState(3.5);
+  const [lng, setLng] = useState(-95);
+  const [lat, setLat] = useState(39);
+  const [zoom, setZoom] = useState(3.8);
   const [pitch, setPitch] = useState(0);
   const [geoMap, setGeoMap] = useState(geoJson.features);
   const [geoMapItem, setGeoMapItem] = useState({ data: [] });
@@ -24,6 +24,37 @@ const Map = () => {
   const [isLoading, setIsLoading] = useState(false);
   const popUpElement = useRef(null);
 
+  //fetch data when selectedItem is changed/update
+  useEffect(() => {
+    const fetchIP = async () => {
+      try {
+        const { data } = await axios.get(
+          `http://ip-api.com/json?fields=status,message,lat,lon,query`,
+          {
+            headers: {
+              Accept: "application/json",
+            },
+          }
+        );
+        setLng(data.lon)
+        setLat(data.lat)
+        console.log(lng, lat)
+      } catch (err) {
+        console.log(err.message);
+      } finally {
+        map.current.flyTo({
+          center: [lng, lat],
+          zoom: 7,
+          duration: 4000,
+          essential: true, // This animation is considered essential with
+          //respect to prefers-reduced-motion
+        });
+      }
+    };
+
+    fetchIP();
+  }, [lng, lat]);
+  
   //Load map, add locations and set onClick
   useEffect(() => {
     if (map.current) return; // initialize map only once
@@ -36,29 +67,42 @@ const Map = () => {
     });
 
     map.current.on("load", function () {
-      // Add an image to use as a custom marker
-      map.current.loadImage("pin.png", function (error, image) {
-        if (error) throw error;
-        map.current.addImage("custom-marker", image);
+      // Add points custom marker
+      map.current.addSource("points", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: geoMap,
+        },
+      });
 
-        // Add a GeoJSON source with multiple points
-        map.current.addSource("points", {
-          type: "geojson",
-          data: {
-            type: "FeatureCollection",
-            features: geoMap,
-          },
-        });
+      map.current.addLayer({
+        id: "points",
+        source: "points",
+        type: "circle",
+        paint: {
+          "circle-radius": 8,
+          "circle-color": "#046ba7",
+        },
+      });
 
-        // Add a symbol layer to add in custom marker
-        map.current.addLayer({
-          id: "points",
-          type: "symbol",
-          source: "points",
-          layout: {
-            "icon-image": "custom-marker",
-          },
-        });
+      //single point
+      map.current.addSource("single-point", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: [],
+        },
+      });
+
+      map.current.addLayer({
+        id: "point",
+        source: "single-point",
+        type: "circle",
+        paint: {
+          "circle-radius": 8,
+          "circle-color": "#019765",
+        },
       });
 
       //Check for click action on map
@@ -98,6 +142,11 @@ const Map = () => {
     const geocoder = new MapboxGeocoder({
       accessToken: mapboxgl.accessToken,
       mapboxgl: mapboxgl,
+      countries: "us",
+      marker: false,
+      proximity: "ip",
+      trackProximity: false,
+      placeholder: "City, State, or Zip",
     });
 
     //add geo search to map
@@ -107,15 +156,7 @@ const Map = () => {
     geocoder.on("result", (event) => {
       //sort items from nearest to farthest distance from search location
       sortItems(event.result.geometry);
-    });
-
-    //recenter map if user clear search
-    geocoder.on("clear", () => {
-      map.current.fitBounds([
-        //re-centers to the US because our map items almost span the entire world. You could use Turf.js to find the bbox for the map items as well
-        [-124, 49],
-        [-77, 24],
-      ]);
+      map.current.getSource("single-point").setData(event.result.geometry);
     });
 
     /*
@@ -232,12 +273,6 @@ const Map = () => {
     <>
       <div className="map-wrapper">
         <section ref={mapContainer} className="map-container" />
-        <LocationButton
-          geoMap={geoMap}
-          selectedItem={selectedItem}
-          createPopUp={createPopUp}
-          flyToLocation={flyToLocation}
-        />
       </div>
       <div ref={popUpElement}>
         <LocationPopup geoMapItem={geoMapItem} isLoading={isLoading} />
