@@ -1,6 +1,6 @@
 import { connectHits } from "react-instantsearch-dom";
 
-const LocationButton = connectHits(({ hits, selectedItem }) => {
+const LocationButton = connectHits(({ hits, selectedItem, createPopUp, flyToLocation }) => {
   return (
     <ul className="item-list">
       {hits.map((hit) => (

@@ -71,7 +71,9 @@ const Map = () => {
         /* If it does not exist, return */
         if (!features.length) return;
 
-        const clickedPoint = features[0];
+        const clickedPoint = features;
+
+        console.log(clickedPoint)
 
         /* Fly to the point */
         flyToLocation(clickedPoint);
@@ -89,33 +91,6 @@ const Map = () => {
       map.current.on("mouseleave", "points", () => {
         map.current.getCanvas().style.cursor = "";
       });
-    });
-
-    /**
-     * Geo search input
-     */
-    //set up a new geo search
-    const geocoder = new MapboxGeocoder({
-      accessToken: mapboxgl.accessToken,
-      mapboxgl: mapboxgl,
-    });
-
-    //add geo search to map
-    map.current.addControl(geocoder, "top-left");
-
-    //after users searches and clicks on a result
-    geocoder.on("result", (event) => {
-      //sort items from nearest to farthest distance from search location
-      sortItems(event.result.geometry);
-    });
-
-    //recenter map if user clear search
-    geocoder.on("clear", () => {
-      map.current.fitBounds([
-        //re-centers to the US because our map items almost span the entire world. You could use Turf.js to find the bbox for the map items as well
-        [-124, 49],
-        [-77, 24],
-      ]);
     });
 
     /*
@@ -230,7 +205,16 @@ const Map = () => {
 
   return (
     <>
-      <section ref={mapContainer} className="map-container" />
+      <div className="map-wrapper">
+        <section ref={mapContainer} className="map-container" />
+        <aside className="list">
+          <LocationButton
+            selectedItem={selectedItem}
+            createPopUp={createPopUp}
+            flyToLocation={flyToLocation}
+          />
+        </aside>
+      </div>
       <div ref={popUpElement}>
         <LocationPopup geoMapItem={geoMapItem} isLoading={isLoading} />
       </div>
