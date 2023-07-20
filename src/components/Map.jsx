@@ -230,9 +230,7 @@ const Map = () => {
 
   return (
     <>
-      <div className="map-wrapper">
-        <section ref={mapContainer} className="map-container" />
-      </div>
+      <section ref={mapContainer} className="map-container" />
       <div ref={popUpElement}>
         <LocationPopup geoMapItem={geoMapItem} isLoading={isLoading} />
       </div>

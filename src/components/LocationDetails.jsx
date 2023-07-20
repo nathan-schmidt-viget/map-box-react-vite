@@ -8,7 +8,7 @@ const LocationDetails = ({ geoMapItem, isLoading }) => {
     return null;
   }
   return (
-    <article>
+    <article className="location-details">
       {isLoading && <p className="loading">Loading...</p>}
       {!isLoading && geoMapItem.data.map((location) => (
         <div key={location.id} className="location">

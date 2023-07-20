@@ -21,24 +21,19 @@ function App() {
     <>
       <h1>National Park Service Locations</h1>
       <InstantSearch searchClient={searchClient} indexName={indexName}>
-        <Configure
+        {/* <Configure
           aroundLatLngViaIP={true}
           aroundRadius="all"
           hitsPerPage={6}
-        />
+        /> */}
         <SearchBox />
-        <Hits
-          hitComponent={(hit) => (
-            <LocationButton
-              key={hit.hit.objectID}
-              onClick={(hit) => handleClick(hit)}
-              park={hit}
-              selectedItem={selectedItem}
-            />
-          )}
-        />
+        <div className="map-wrapper">
+          <aside className="list">
+            <LocationButton />
+          </aside>
+          <Map />
+        </div>
       </InstantSearch>
-      <Map />
       <footer className="footer">
         <p>Built on Vite and React</p>
         <div className="logos">
