@@ -16,7 +16,7 @@ const Map = () => {
   const map = useRef(null);
   const [lng, setLng] = useState(-95);
   const [lat, setLat] = useState(39);
-  const [zoom, setZoom] = useState(3.8);
+  const [zoom, setZoom] = useState(2.5);
   const [pitch, setPitch] = useState(0);
   const [geoMap, setGeoMap] = useState(geoJson.features);
   const [geoMapItem, setGeoMapItem] = useState({ data: [] });
@@ -24,7 +24,7 @@ const Map = () => {
   const [isLoading, setIsLoading] = useState(false);
   const popUpElement = useRef(null);
 
-  //fetch data when selectedItem is changed/update
+  //fetch data to find the users IP and then center and zoom the map to that area
   useEffect(() => {
     const fetchIP = async () => {
       try {
@@ -38,16 +38,15 @@ const Map = () => {
         );
         setLng(data.lon)
         setLat(data.lat)
-        console.log(lng, lat)
       } catch (err) {
         console.log(err.message);
       } finally {
+        //if we successfully get the user's IP we fly to that location
         map.current.flyTo({
           center: [lng, lat],
-          zoom: 7,
-          duration: 4000,
-          essential: true, // This animation is considered essential with
-          //respect to prefers-reduced-motion
+          zoom: 6,
+          duration: 5000,
+          essential: true, 
         });
       }
     };
@@ -228,6 +227,7 @@ const Map = () => {
       .addTo(map.current);
   };
 
+  //only used if we show the full list of locations
   const sortItems = (searchResult) => {
     const sortedGeoMap = [...geoMap];
     const options = { units: "miles" };
