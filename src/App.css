@@ -1,12 +1,5 @@
 #root {
-  margin: 0 auto;
-  max-width: 1280px;
-  text-align: center;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
+
 }
 
 .button{

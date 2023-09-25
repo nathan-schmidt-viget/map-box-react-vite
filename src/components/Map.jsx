@@ -271,7 +271,7 @@ const Map = () => {
 
   return (
     <>
-      <div className="map-wrapper">
+      <div className="w-full">
         <section ref={mapContainer} className="map-container" />
       </div>
       <div ref={popUpElement}>
