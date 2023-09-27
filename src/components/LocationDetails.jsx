@@ -33,12 +33,12 @@ const LocationDetails = ({ geoMapItem, isLoading, locationPopUp, setLocationPopU
         </button>
       </form>
 
-      {!isLoading && geoMapItem.data.map((location) => (
-        <>
+      {!isLoading && geoMapItem.data.map((location, index) => (
+        <div key={index}>
           <div className="w-full flex snap-x overflow-x-auto overflow-y-hidden">
             {location.images.map((image, index) => (
-              <div className="shrink-0 w-2/3 aspect-video group">
-                <figure key={index} className="h-full relative">
+              <div key={index} className="shrink-0 w-2/3 aspect-video group">
+                <figure className="h-full relative">
                   <img src={image.url} alt={image.altText} className="object-cover h-full w-full" />
                   <figcaption className="absolute bottom-0 bg-zinc-900/70 px-3 py-2 text-white w-full translate-y-full group-hover:translate-y-0 ease-in-out duration-300 transition-transform">
                     {image.caption}
@@ -116,7 +116,7 @@ const LocationDetails = ({ geoMapItem, isLoading, locationPopUp, setLocationPopU
               <a href={location.url} className="btn mt-2" target="_blank">View NPS Page</a>
             </aside>
           </div>
-        </>
+        </div>
       ))}
     </dialog>
   );

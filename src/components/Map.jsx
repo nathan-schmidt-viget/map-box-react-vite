@@ -38,7 +38,6 @@ const Map = () => {
         );
         setLng(data.longitude)
         setLat(data.latitude)
-        console.log(data)
       } catch (err) {
         console.log(err.message);
       } finally {
@@ -207,7 +206,6 @@ const Map = () => {
       center: currentItem.geometry.coordinates,
       zoom: 8.5,
       duration: 3000,
-      pitch: 55,
       essential: true, // This animation is considered essential with
       //respect to prefers-reduced-motion
     });

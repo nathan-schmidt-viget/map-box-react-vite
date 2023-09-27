@@ -10,13 +10,14 @@ import mapboxLogo from "./assets/mapbox-logo-white.svg";
 function App() {
   return (
     <>
-      <div className="py-8 max-w-4xl mx-auto text-center px-4">
-        <h1 className="text-6xl">National Park Service Locations</h1>
+      <div className="py-8 max-w-4xl mx-auto px-4">
+        <h1 className="text-6xl text-center">National Park Service Locations</h1>
         <p className="text-md mt-8">
           The National Park Service manages and preserves over 400 stunning locations across the United States, ranging from iconic natural wonders like the Grand Canyon to historic sites such as Independence Hall.
         </p>
         <p className="text-md mt-4">
           This exploration looks into building a better location search tool using <a className="underline hover:no-underline" href="https://www.mapbox.com/">Mapbox</a>. 
+          Search a city, state, or zip to find the nearest park location.
         </p>
       </div>
       <Map />
