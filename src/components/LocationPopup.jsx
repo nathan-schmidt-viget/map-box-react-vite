@@ -1,4 +1,4 @@
-const LocationPopup = ({ geoMapItem, isLoading }) => (
+const LocationPopup = ({ geoMapItem, isLoading, setLocationPopUp }) => (
   <>
     {isLoading && <p className="loading">Loading...</p>}
     {!isLoading && geoMapItem.data.map(park => (
@@ -8,9 +8,9 @@ const LocationPopup = ({ geoMapItem, isLoading }) => (
           {park.addresses[0].line1}<br></br>
           {park.addresses[0].city}, {park.addresses[0].stateCode} {park.addresses[0].postalCode}
         </p>
-        <a href={park.url} target="_blank" className="button">
-          View NPS Page
-        </a>
+        <button className="button" onClick={() => setLocationPopUp(true)}>
+          View More Info
+        </button>
       </div>
     ))}
   </>

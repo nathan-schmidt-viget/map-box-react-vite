@@ -1,4 +1,15 @@
-const LocationDetails = ({ geoMapItem, isLoading }) => {
+import React, { useRef, useEffect } from "react";
+
+const LocationDetails = ({ geoMapItem, isLoading, locationPopUp, setLocationPopUp }) => {
+  const locationDetailsPopUp = useRef(null);
+
+  // when open changes run open/close command
+  useEffect(() => {
+    const { current: el } = locationDetailsPopUp;
+    if (locationPopUp) el.showModal();
+  }, [locationPopUp]);
+
+
   const formatPhoneNumber = (phoneNumberString) => {
     var cleaned = ('' + phoneNumberString).replace(/\D/g, '');
     var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
@@ -7,8 +18,12 @@ const LocationDetails = ({ geoMapItem, isLoading }) => {
     }
     return null;
   }
+
   return (
-    <article className="px-4 mt-8 max-w-6xl mx-auto w-full basis-1/2">
+    <dialog
+      ref={locationDetailsPopUp}
+      className="px-6 py-8 mt-8 max-w-6xl mx-auto w-full basis-1/2 rounded-md bg-zinc-100 backdrop:bg-zinc-900 backdrop:opacity-70"
+    >
       {isLoading && <p className="loading">Loading...</p>}
       {!isLoading && geoMapItem.data.map((location) => (
         <div key={location.id} >
@@ -86,7 +101,12 @@ const LocationDetails = ({ geoMapItem, isLoading }) => {
           </aside>
         </div>
       ))}
-    </article>
+       <form method="dialog">
+        <button onClick={() => setLocationPopUp(false)}>
+          Close
+        </button>
+      </form>
+    </dialog>
   );
 };
 
