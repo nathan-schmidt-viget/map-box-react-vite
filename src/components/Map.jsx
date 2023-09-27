@@ -2,16 +2,22 @@ import React, { useRef, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
-import axios from "axios";
 import * as turf from "@turf/turf";
-import geoJson from "../assets/nps.json";
+import axios from "axios";
+import geoJson from "/src/assets/nps.json";
+mapboxgl.accessToken = import.meta.env.VITE_MAP_BOX_KEY;
+
+import GetNPS from "/src/api/GetNPS";
+import flyToLocation from "/src/utils/flyToLocation";
+
+import LocationButtons from "./LocationButtons";
 import LocationPopup from "./LocationPopup";
 import LocationDetails from "./LocationDetails";
-mapboxgl.accessToken = import.meta.env.VITE_MAP_BOX_KEY;
 
 const Map = () => {
   const mapContainer = useRef(null);
   const map = useRef(null);
+  const popUpElement = useRef(null);
   const [lng, setLng] = useState(-95);
   const [lat, setLat] = useState(39);
   const [zoom, setZoom] = useState(2.5);
@@ -20,8 +26,10 @@ const Map = () => {
   const [geoMapItem, setGeoMapItem] = useState({ data: [] });
   const [selectedItem, setSelectedItem] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const popUpElement = useRef(null);
+  const [showSidebar, setShowSidebar] = useState(false);
   const [locationPopUp, setLocationPopUp] = useState(false);
+
+  GetNPS(selectedItem, setGeoMapItem, setIsLoading);
 
   //fetch data to find the users IP and then center and zoom the map to that area
   useEffect(() => {
@@ -47,6 +55,9 @@ const Map = () => {
           duration: 3000,
           essential: true,
         });
+        sortItems({
+          coordinates: [lng, lat],
+        }, false);
       }
     };
 
@@ -84,12 +95,11 @@ const Map = () => {
         paint: {
           "circle-stroke-width": 1,
           "circle-stroke-color": "#fff",
-          "circle-radius": 8,
           "circle-color": [
             "step",
             ["get", "point_count"],
             "#024870",
-            10,
+            20,
             "#046ba7",
             100,
             "#028edd",
@@ -98,7 +108,7 @@ const Map = () => {
             "step",
             ["get", "point_count"],
             20,
-            10,
+            20,
             30,
             100,
             40,
@@ -150,7 +160,7 @@ const Map = () => {
         const clickedPoint = features[0];
 
         /* Fly to the point */
-        flyToLocation(clickedPoint);
+        flyToLocation(map, clickedPoint);
 
         /* Close all other popups and display popup for clicked item */
         createPopUp(clickedPoint);
@@ -177,6 +187,23 @@ const Map = () => {
       });
     });
 
+    /*
+     * Add my location button
+     */
+    const geolocate = new mapboxgl.GeolocateControl();
+    map.current.addControl(geolocate);
+    geolocate.on("geolocate", (event) => {
+      sortItems({
+        coordinates: [event.coords.longitude, event.coords.latitude],
+      });
+      setShowSidebar(true)
+    });
+
+    /*
+     * Add navigation control (the +/- zoom buttons)
+     */
+    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
+
     /**
      * Geo search input
      */
@@ -197,62 +224,11 @@ const Map = () => {
     //after users searches and clicks on a result
     geocoder.on("result", (event) => {
       //sort items from nearest to farthest distance from search location
-      sortItems(event.result.geometry);
-      map.current.getSource("unclustered-point").setData(event.result.geometry);
+      sortItems(event.result.geometry)
+      setShowSidebar(true)
     });
 
-    /*
-     * Add navigation control (the +/- zoom buttons)
-     */
-    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
-
-    /*
-     * Add my location button
-     */
-    const geolocate = new mapboxgl.GeolocateControl();
-    map.current.addControl(geolocate);
-    geolocate.on("geolocate", (event) => {
-      sortItems({
-        coordinates: [event.coords.longitude, event.coords.latitude],
-      });
-    });
   });
-
-  //fetch data when selectedItem is changed/update
-  useEffect(() => {
-    const fetchMapItemData = async () => {
-      setIsLoading(true);
-      try {
-        const { data } = await axios.get(
-          `https://developer.nps.gov/api/v1/parks?parkCode=${selectedItem}&limit=1&api_key=${
-            import.meta.env.VITE_NPS_KEY
-          }`,
-          {
-            headers: {
-              Accept: "application/json",
-            },
-          }
-        );
-        setGeoMapItem(data);
-      } catch (err) {
-        console.log(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchMapItemData();
-  }, [selectedItem]);
-
-  const flyToLocation = (currentItem) => {
-    map.current.flyTo({
-      center: currentItem.geometry.coordinates,
-      zoom: 8.5,
-      duration: 3000,
-      essential: true, // This animation is considered essential with
-      //respect to prefers-reduced-motion
-    });
-  };
 
   const createPopUp = (currentItem) => {
     setSelectedItem(currentItem.properties.Code);
@@ -263,14 +239,14 @@ const Map = () => {
     if (popUps[0]) popUps[0].remove();
 
     //mapbox popup offset to center on custom marker - https://docs.mapbox.com/mapbox-gl-js/api/markers/#popup
-    const popup = new mapboxgl.Popup({ offset: [8, -10] })
+    const popup = new mapboxgl.Popup({ offset: [0, -10] })
       .setLngLat(coordinates)
       .setDOMContent(popUpElement.current)
       .addTo(map.current);
   };
 
   //only used if we show the full list of locations
-  const sortItems = (searchResult) => {
+  const sortItems = (searchResult, showPopup=true) => {
     const sortedGeoMap = [...geoMap];
     const options = { units: "miles" };
     //add the distance to the array
@@ -297,23 +273,36 @@ const Map = () => {
     setGeoMap(sortedGeoMap);
 
     //fit map zoom to the search location and closest location - https://turfjs.org/docs/#bbox
-    map.current.fitBounds(
-      turf.bbox(
-        turf.lineString([
-          sortedGeoMap[0].geometry.coordinates,
-          searchResult.coordinates,
-        ])
-      ),
-      { padding: 100 }
-    );
+    if (showPopup) {
+      map.current.fitBounds(
+        turf.bbox(
+          turf.lineString([
+            sortedGeoMap[0].geometry.coordinates,
+            searchResult.coordinates,
+          ])
+        ),
+        { padding: 100 }
+      );
 
-    //open popup box for the closest location
-    createPopUp(sortedGeoMap[0]);
+      // //open popup box for the closest location
+      createPopUp(sortedGeoMap[0]);
+    }
   };
 
   return (
     <>
-      <section ref={mapContainer} className="w-full h-[70vh]" />
+      <div className="flex overflow-hidden h-[70vh] relative">
+        <LocationButtons
+          map={map}
+          geoMap={geoMap}
+          selectedItem={selectedItem}
+          createPopUp={createPopUp}
+          flyToLocation={flyToLocation}
+          showSidebar={showSidebar}
+          setShowSidebar={setShowSidebar}
+        />
+        <section ref={mapContainer} className="w-full h-full grow" />
+      </div>
       <div ref={popUpElement}>
         <LocationPopup
           geoMapItem={geoMapItem}
