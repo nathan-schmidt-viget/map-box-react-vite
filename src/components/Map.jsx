@@ -23,6 +23,8 @@ const Map = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const popUpElement = useRef(null);
+  const [locationPopUp, setLocationPopUp] = useState(false);
+
 
   //fetch data to find the users IP and then center and zoom the map to that area
   useEffect(() => {
@@ -275,9 +277,18 @@ const Map = () => {
         <section ref={mapContainer} className="map-container" />
       </div>
       <div ref={popUpElement}>
-        <LocationPopup geoMapItem={geoMapItem} isLoading={isLoading} />
+        <LocationPopup
+          geoMapItem={geoMapItem}
+          isLoading={isLoading}
+          setLocationPopUp={setLocationPopUp}
+        />
       </div>
-      <LocationDetails geoMapItem={geoMapItem} isLoading={isLoading} />
+      <LocationDetails
+        geoMapItem={geoMapItem}
+        isLoading={isLoading}
+        setLocationPopUp={setLocationPopUp}
+        locationPopUp={locationPopUp}
+      />
     </>
   );
 };
