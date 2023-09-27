@@ -23,7 +23,6 @@ const Map = () => {
   const popUpElement = useRef(null);
   const [locationPopUp, setLocationPopUp] = useState(false);
 
-
   //fetch data to find the users IP and then center and zoom the map to that area
   useEffect(() => {
     const fetchIP = async () => {
@@ -36,24 +35,24 @@ const Map = () => {
             },
           }
         );
-        setLng(data.longitude)
-        setLat(data.latitude)
+        setLng(data.longitude);
+        setLat(data.latitude);
       } catch (err) {
         console.log(err.message);
       } finally {
         //if we successfully get the user's IP we fly to that location
         map.current.flyTo({
           center: [lng, lat],
-          zoom: 6,
-          duration: 5000,
-          essential: true, 
+          zoom: 5,
+          duration: 3000,
+          essential: true,
         });
       }
     };
 
     fetchIP();
   }, [lng, lat]);
-  
+
   //Load map, add locations and set onClick
   useEffect(() => {
     if (map.current) return; // initialize map only once
@@ -69,6 +68,8 @@ const Map = () => {
       // Add points custom marker
       map.current.addSource("points", {
         type: "geojson",
+        cluster: true,
+        clusterMaxZoom: 14,
         data: {
           type: "FeatureCollection",
           features: geoMap,
@@ -76,39 +77,71 @@ const Map = () => {
       });
 
       map.current.addLayer({
-        id: "points",
+        id: "clusters",
         source: "points",
+        filter: ["has", "point_count"],
         type: "circle",
         paint: {
+          "circle-stroke-width": 1,
+          "circle-stroke-color": "#fff",
           "circle-radius": 8,
-          "circle-color": "#046ba7",
-        },
-      });
-
-      //single point
-      map.current.addSource("single-point", {
-        type: "geojson",
-        data: {
-          type: "FeatureCollection",
-          features: [],
+          "circle-color": [
+            "step",
+            ["get", "point_count"],
+            "#024870",
+            10,
+            "#046ba7",
+            100,
+            "#028edd",
+          ],
+          "circle-radius": [
+            "step",
+            ["get", "point_count"],
+            20,
+            10,
+            30,
+            100,
+            40,
+          ],
         },
       });
 
       map.current.addLayer({
-        id: "point",
-        source: "single-point",
+        id: "unclustered-point",
+        source: "points",
+        filter: ["!", ["has", "point_count"]],
         type: "circle",
         paint: {
-          "circle-radius": 8,
-          "circle-color": "#019765",
+          "circle-radius": 7,
+          "circle-color": "#046ba7",
+          "circle-stroke-width": 1,
+          "circle-stroke-color": "#fff",
         },
       });
 
-      //Check for click action on map
-      map.current.on("click", "points", (e) => {
+      // inspect a cluster on click
+      map.current.on("click", "clusters", (e) => {
+        const features = map.current.queryRenderedFeatures(e.point, {
+          layers: ["clusters"],
+        });
+        const clusterId = features[0].properties.cluster_id;
+        map.current
+          .getSource("points")
+          .getClusterExpansionZoom(clusterId, (err, zoom) => {
+            if (err) return;
+
+            map.current.easeTo({
+              center: features[0].geometry.coordinates,
+              zoom: zoom,
+            });
+          });
+      });
+
+      //Check for click on point on map
+      map.current.on("click", "unclustered-point", (e) => {
         /* Determine if a feature in the "locations" layer exists at that item. */
         const features = map.current.queryRenderedFeatures(e.point, {
-          layers: ["points"],
+          layers: ["unclustered-point"],
         });
 
         /* If it does not exist, return */
@@ -124,12 +157,22 @@ const Map = () => {
       });
 
       // Change the cursor to a pointer when the mouse is over the places layer.
-      map.current.on("mouseenter", "points", () => {
+      map.current.on("mouseenter", "unclustered-point", () => {
         map.current.getCanvas().style.cursor = "pointer";
       });
 
       // Change it back to a pointer when it leaves.
-      map.current.on("mouseleave", "points", () => {
+      map.current.on("mouseleave", "unclustered-point", () => {
+        map.current.getCanvas().style.cursor = "";
+      });
+
+      // Change the cursor to a pointer when the mouse is over the places layer.
+      map.current.on("mouseenter", "clusters", () => {
+        map.current.getCanvas().style.cursor = "pointer";
+      });
+
+      // Change it back to a pointer when it leaves.
+      map.current.on("mouseleave", "clusters", () => {
         map.current.getCanvas().style.cursor = "";
       });
     });
@@ -155,7 +198,7 @@ const Map = () => {
     geocoder.on("result", (event) => {
       //sort items from nearest to farthest distance from search location
       sortItems(event.result.geometry);
-      map.current.getSource("single-point").setData(event.result.geometry);
+      map.current.getSource("unclustered-point").setData(event.result.geometry);
     });
 
     /*
