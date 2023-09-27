@@ -61,7 +61,7 @@ const Map = () => {
     if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/nathanschmidt3/cljfx7gfp002m01r4bpq2642c",
+      style: "mapbox://styles/nathanschmidt3/cljho2wwr001u01p12jda5ev0",
       center: [lng, lat],
       zoom: zoom,
       pitch: pitch,
@@ -273,9 +273,7 @@ const Map = () => {
 
   return (
     <>
-      <div className="w-full">
-        <section ref={mapContainer} className="map-container" />
-      </div>
+      <section ref={mapContainer} className="w-full h-[70vh]" />
       <div ref={popUpElement}>
         <LocationPopup
           geoMapItem={geoMapItem}

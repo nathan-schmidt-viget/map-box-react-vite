@@ -5,6 +5,7 @@ import "./App.css";
 
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
+import mapboxLogo from "./assets/mapbox-logo-white.svg";
 
 function App() {
   return (
@@ -15,17 +16,26 @@ function App() {
           The National Park Service manages and preserves over 400 stunning locations across the United States, ranging from iconic natural wonders like the Grand Canyon to historic sites such as Independence Hall.
         </p>
         <p className="text-md mt-4">
-          This exploration looks into build a better location search tool using <a className="underline hover:no-underline" href="https://www.mapbox.com/">MapBox</a>. 
+          This exploration looks into building a better location search tool using <a className="underline hover:no-underline" href="https://www.mapbox.com/">Mapbox</a>. 
         </p>
       </div>
       <Map />
-      <footer className="footer">
-        <p>Built on Vite and React</p>
-        <div className="logos"> 
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-          <img src={reactLogo} className="logo react" alt="React logo" />
+      <footer className="flex flex-wrap gap-6 justify-center pt-8 pb-3">
+        <div className="flex flex-wrap gap-8 justify-center"> 
+          <a href="https://www.mapbox.com/">
+            <span className="sr-only">Mapbox</span>
+            <img src={mapboxLogo} className="w-32" alt="Mapbox logo" />
+          </a>
+          <a href="https://vitejs.dev/">
+            <span className="sr-only">Vite.js</span>
+            <img src={viteLogo} className="w-8" alt="Vite logo" />
+          </a>
+          <a href="https://react.dev/">
+            <span className="sr-only">React</span>
+            <img src={reactLogo} className="w-8" alt="React logo" />
+          </a>
         </div>
-        <p>View on <a href="https://github.com/nathan-schmidt-viget/map-box-react-vite">GitHub</a></p>
+        <p className="w-full text-center text-xs">Built on Mapbox, Vite, and React | <a href="https://github.com/nathan-schmidt-viget/map-box-react-vite">View on GitHub</a></p>
       </footer>
     </>
   );

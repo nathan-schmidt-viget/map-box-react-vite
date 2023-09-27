@@ -7,6 +7,17 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    ({addComponents}) => {
+      addComponents({
+        '.btn': {
+          '@apply inline-block bg-sky-800 rounded text-white py-2 px-4 hover:bg-emerald-800 ease-out duration-300': {},
+        },
+        '.mapboxgl-popup .mapboxgl-popup-close-button': {
+          '@apply !px-2 text-zinc-900': {},
+        },
+      })
+    }
+  ],
 }
 
