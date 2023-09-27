@@ -4,9 +4,7 @@ import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import axios from "axios";
 import * as turf from "@turf/turf";
-
 import geoJson from "../assets/nps.json";
-//import LocationButton from "./LocationButton";
 import LocationPopup from "./LocationPopup";
 import LocationDetails from "./LocationDetails";
 mapboxgl.accessToken = import.meta.env.VITE_MAP_BOX_KEY;
@@ -31,15 +29,16 @@ const Map = () => {
     const fetchIP = async () => {
       try {
         const { data } = await axios.get(
-          `http://ip-api.com/json?fields=status,message,lat,lon,query`,
+          `https://api.ipdata.co?api-key=${import.meta.env.VITE_IPDATA_KEY}`,
           {
             headers: {
               Accept: "application/json",
             },
           }
         );
-        setLng(data.lon)
-        setLat(data.lat)
+        setLng(data.longitude)
+        setLat(data.latitude)
+        console.log(data)
       } catch (err) {
         console.log(err.message);
       } finally {
