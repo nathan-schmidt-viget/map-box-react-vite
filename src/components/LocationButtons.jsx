@@ -11,8 +11,8 @@ const LocationButtons = ({
   setShowSidebar
 }) => {
   const sideBarClasses = [
-    "bg-white flex-col gap-3 overflow-y-auto text-left p-2 max-w-sm items-end h-full",
-    showSidebar ? "flex" : "hidden",
+    "flex bg-white flex-col gap-3 overflow-y-auto text-left p-2 md:max-w-sm items-end h-[50vh] md:h-full",
+    showSidebar ? "" : "md:hidden",
   ];
 
   const toggleSidebar = () => {
@@ -20,8 +20,8 @@ const LocationButtons = ({
   };
 
   return (
-    <div className="relative">
-      <div className="absolute inset-y-0 right-0 z-[1] translate-x-full flex items-center">
+    <div className="relative order-last md:order-first w-full md:w-auto">
+      <div className="hidden md:flex absolute inset-y-0 right-0 z-[1] translate-x-full items-center">
         <button
           onClick={() => toggleSidebar()}
           className="flex items-center bg-white text-sm gap-1 rounded-b-lg text-zinc-900 py-2 px-4 hover:bg-emerald-800 hover:text-white -rotate-90 -translate-x-10"
@@ -42,7 +42,7 @@ const LocationButtons = ({
 
       <aside className={sideBarClasses.join(" ").trim()}>
         <button
-          className="sticky top-0 w-8 h-8 hover:text-white hover:bg-zinc-900 rounded text-zinc-900 bg-white focus:text-white focus:bg-zinc-900"
+          className="hidden md:block sticky top-0 w-8 h-8 hover:text-white hover:bg-zinc-900 rounded text-zinc-900 bg-white focus:text-white focus:bg-zinc-900"
           onClick={() => toggleSidebar()}
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
