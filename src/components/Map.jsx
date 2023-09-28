@@ -73,6 +73,7 @@ const Map = () => {
       center: [lng, lat],
       zoom: zoom,
       pitch: pitch,
+      cooperativeGestures: true
     });
 
     map.current.on("load", function () {
@@ -80,7 +81,7 @@ const Map = () => {
       map.current.addSource("points", {
         type: "geojson",
         cluster: true,
-        clusterMaxZoom: 14,
+        clusterMaxZoom: 8,
         data: {
           type: "FeatureCollection",
           features: geoMap,
@@ -291,7 +292,7 @@ const Map = () => {
 
   return (
     <>
-      <div className="flex overflow-hidden h-[70vh] relative">
+      <div className="flex flex-wrap md:flex-nowrap overflow-hidden md:h-[70vh] relative">
         <LocationButtons
           map={map}
           geoMap={geoMap}
@@ -301,7 +302,7 @@ const Map = () => {
           showSidebar={showSidebar}
           setShowSidebar={setShowSidebar}
         />
-        <section ref={mapContainer} className="w-full h-full grow" />
+        <section ref={mapContainer} className="w-full h-[70vh] md:h-full grow" />
       </div>
       <div ref={popUpElement}>
         <LocationPopup
