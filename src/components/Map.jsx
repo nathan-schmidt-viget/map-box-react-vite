@@ -22,6 +22,7 @@ const Map = () => {
   const [lat, setLat] = useState(39);
   const [zoom, setZoom] = useState(2.5);
   const [pitch, setPitch] = useState(0);
+  const [searchRadius] = useState('350');
   const [geoMap, setGeoMap] = useState(geoJson.features);
   const [geoMapItem, setGeoMapItem] = useState({ data: [] });
   const [selectedItem, setSelectedItem] = useState(null);
@@ -257,6 +258,7 @@ const Map = () => {
         item.geometry.coordinates,
         options
       );
+      item.show = item.properties.distance > searchRadius ? false : true;
     });
 
     //sort the array by the distance
@@ -301,6 +303,7 @@ const Map = () => {
           flyToLocation={flyToLocation}
           showSidebar={showSidebar}
           setShowSidebar={setShowSidebar}
+          searchRadius={searchRadius}
         />
         <section ref={mapContainer} className="w-full h-[70vh] md:h-full grow" />
       </div>
