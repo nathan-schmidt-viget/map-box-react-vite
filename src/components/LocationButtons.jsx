@@ -13,7 +13,7 @@ const LocationButtons = ({
   searchRadius
 }) => {
   const sideBarClasses = [
-    "flex bg-white flex-col gap-3 overflow-y-auto text-left p-2 md:max-w-sm h-[50vh] md:h-full",
+    "flex bg-white flex-col gap-3 overflow-y-auto text-left p-2 md:w-full md:max-w-sm h-[50vh] md:h-full",
     showSidebar ? "" : "md:hidden",
   ];
 
@@ -66,7 +66,7 @@ const LocationButtons = ({
               createPopUp(item, e), flyToLocation(map, item);
             }}
           >
-            <div className="w-5">
+            <div className="w-5 shrink-0">
               <MapPinSvg/>
             </div>
             <span className="flex flex-col text-left">
