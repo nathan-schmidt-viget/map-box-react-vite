@@ -13,7 +13,7 @@ const LocationButtons = ({
   searchRadius
 }) => {
   const sideBarClasses = [
-    "flex bg-white flex-col gap-3 overflow-y-auto text-left p-2 md:max-w-sm h-[50vh] md:h-full",
+    "flex bg-white flex-col gap-3 overflow-y-auto text-left p-2 md:w-80 min-w-full h-[50vh] md:h-full",
     showSidebar ? "" : "md:hidden",
   ];
 
@@ -52,7 +52,8 @@ const LocationButtons = ({
             <span className="sr-only">Close</span>
           </button>
           <p className="text-xs text-black">
-            Showing {currentTotal} locations within {searchRadius} miles.
+            {currentTotal == 0 && 'No locations'}
+            {currentTotal > 0 && `Showing ${currentTotal} locations within ${searchRadius} miles.`}
           </p>
         </div>
         {geoMap.map((item) => (

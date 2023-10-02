@@ -22,7 +22,7 @@ const Map = () => {
   const [lat, setLat] = useState(39);
   const [zoom, setZoom] = useState(2.5);
   const [pitch, setPitch] = useState(0);
-  const [searchRadius] = useState('350');
+  const [searchRadius, setSearchRadius] = useState('350');
   const [geoMap, setGeoMap] = useState(geoJson.features);
   const [geoMapItem, setGeoMapItem] = useState({ data: [] });
   const [selectedItem, setSelectedItem] = useState(null);
@@ -232,6 +232,12 @@ const Map = () => {
 
   });
 
+  useEffect(() => {
+    sortItems({
+      coordinates: [lng, lat],
+    }, false);
+  }, [searchRadius]);
+
   const createPopUp = (currentItem) => {
     setSelectedItem(currentItem.properties.Code);
 
@@ -292,8 +298,23 @@ const Map = () => {
     }
   };
 
+  const updateRadius = (e) => {
+    setSearchRadius(e.target.value)
+  }
+
   return (
     <>
+      <label>
+        Search Radius in Miles
+        <input
+          type="range"
+          min="50"
+          max="1000"
+          step="50"
+          defaultValue={searchRadius} 
+          onChange={(e) => updateRadius(e)}
+        />
+      </label>
       <div className="flex flex-wrap md:flex-nowrap overflow-hidden md:h-[70vh] relative">
         <LocationButtons
           map={map}
