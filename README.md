@@ -1,6 +1,6 @@
 # MapBox Demo using React and Vite
 
-This is a simple demo to explore and test out Map Box. [View Map](https://astounding-fudge-44c956.netlify.app/)
+This is a simple demo to explore and test out Map Box. [View Map](https://map-location-44c956.netlify.app/)
 
 There are several things in this demo that I would suggest changing if you are going to use it for production.
 
